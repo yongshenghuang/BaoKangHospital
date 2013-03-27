@@ -1,0 +1,90 @@
+package com.lhs.dao.impl;
+
+import java.util.List;
+
+import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+
+import com.lhs.dao.ModuleDao;
+import com.lhs.dao.TwitterDao;
+import com.lhs.vo.Module;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+
+public class ModuleDaoImpl implements ModuleDao {
+	// 定义一个HibernateTemplate对象，用于执行持久化操作
+	private HibernateTemplate ht = null;
+	// Hibernate持久化操作所需的SessionFactory
+	private SessionFactory sessionFactory;
+
+	// 依赖注入SessionFactory的setter方法
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+	// 初始化HibernateTemplate的方法
+	private HibernateTemplate getHibernateTemplate() {
+		if (ht == null) {
+			ht = new HibernateTemplate(sessionFactory);
+		}
+		return ht;
+	}
+
+	public void delete(Integer id) {
+		// TODO Auto-generated method stub
+		getHibernateTemplate().delete(get(id));
+	}
+
+	public void delete(Module module) {
+		// TODO Auto-generated method stub
+		getHibernateTemplate().delete(module);
+	}
+
+	public List findUserModule(User user) {
+		// TODO Auto-generated method stub
+		return (List) getHibernateTemplate().find(
+				"from Module where user_id=? order by createtime desc",
+				user.getId());
+	}
+
+	public Module get(Integer id) {
+		// TODO Auto-generated method stub
+		return (Module) getHibernateTemplate().get(Module.class, id);
+	}
+
+	public long getModuleNumber() {
+		return (Long) getHibernateTemplate().find(
+				"select count(*) from module as p").get(0);
+	}
+
+	public Integer save(Module module) {
+		// TODO Auto-generated method stub
+		return (Integer) getHibernateTemplate().save(module);
+	}
+
+	public List findAllModule() {
+		// TODO Auto-generated method stub
+		return (List) getHibernateTemplate().find(
+				"from Module order by createtime desc");
+	}
+
+	public Module findModuleByTitle(String title) {
+		// TODO Auto-generated method stub
+
+		return (Module) (getHibernateTemplate().find(
+				"from Module where title=?",title)).get(0);
+	}
+
+	public void update(Module module) {
+		// TODO Auto-generated method stub
+		getHibernateTemplate().update(module);
+	}
+
+	public List findAllModuleByIslegal(int islegal) {
+		// TODO Auto-generated method stub
+		return (List) getHibernateTemplate().find(
+				"from Module where islegal=? order by createtime desc ",
+				islegal);
+	}
+
+}

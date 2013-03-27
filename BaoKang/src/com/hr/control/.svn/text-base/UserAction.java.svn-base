@@ -1,0 +1,370 @@
+package com.lhs.control;
+
+import java.io.PrintWriter;
+
+
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.interceptor.SessionAware;
+
+import com.lhs.dao.UserDao;
+import com.lhs.vo.User;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class UserAction extends ActionSupport  {
+	public UserDao userdao;
+	public List<User> userlist;
+	String tip;
+	public User user;
+	 	private Map session;
+
+public void pwd_mod() throws Exception{
+	 HttpServletRequest request = ServletActionContext.getRequest();
+
+		int user_id = Integer.parseInt(request.getParameter("user_id"));
+		String pwd1=request.getParameter("repassword1");
+		String pwd2=request.getParameter("repassword2");
+		user=userdao.get(4);
+		if(pwd1.equals(pwd2)){
+		user.setPassword(pwd1);
+		userdao.update(user);
+		}
+		HttpServletResponse response = ServletActionContext.getResponse();
+	
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		if (pwd1.equals(pwd2)) {
+			data.put("info", 1);
+			out.print(data);
+
+		} else {
+			data.put("info", 0);
+			out.print(data);
+		}
+
+		out.close();
+	
+}
+   public void pwdisright()throws Exception{
+	   HttpServletRequest request = ServletActionContext.getRequest();
+
+		int user_id = Integer.parseInt(request.getParameter("user_id"));
+		String pwd=request.getParameter("password");
+		user=userdao.get(4);
+		
+		HttpServletResponse response = ServletActionContext.getResponse();
+		String user_pwd=user.getPassword();
+		//System.out.println("##"+user_id);
+		//System.out.println("##"+pwd);
+		//System.out.println("##"+user_pwd);
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		if (user_pwd.equals(pwd)) {
+			data.put("info", 1);
+			out.print(data);
+
+		} else {
+			data.put("info", 0);
+			out.print(data);
+		}
+
+		out.close();
+	   
+	   
+   }
+	// 注册动作
+	public String register() {
+		user.setNew_login_time(new Timestamp(new Date().getTime()));
+		user.setRegister_time(new Timestamp(new Date().getTime()));
+		user.setIsmember(0);
+		user.setType(0);
+       
+		if (0 != userdao.save(user)) {
+			return "register_success";
+		} else
+			return "register_failure";
+
+	}
+
+	// 登陆动作
+	public String login() {
+		int temp = userdao.checkUser(user);
+		user = userdao.findByEmail(user.getEmail());
+		if (temp != -1 && user.getIsmember() == 1) {
+			session=ActionContext.getContext().getSession();
+			session.put("user",user);
+			if (user.getType() == 0) {
+				user.setNew_login_time(new Timestamp(new Date().getTime()));
+				user.setOnline(1);
+				userdao.update(user);
+				HttpServletRequest request=ServletActionContext.getRequest();
+					
+				return "login_success";
+			} else {
+				user.setNew_login_time(new Timestamp(new Date().getTime()));
+				user.setOnline(1);
+				userdao.update(user);
+				return "manage_index";
+			}
+		}
+		return "login_failure";
+
+	}
+//退出动作
+	public String exit(){
+		session=ActionContext.getContext().getSession();
+		if((User) session.get("user")!=null){
+		User user=userdao.findByEmail(((User) session.get("user")).getEmail());
+		user.setOnline(0);
+		userdao.update(user);
+		}
+		
+		
+		return "login_failure";
+	}
+	// 验证重名
+	public void isDuplicate() throws Exception {
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		out.print(1);
+
+	}
+
+	// 输出userlist的json
+	public void listAll() throws Exception {
+		userlist = userdao.findAllUser();
+		JSONArray jsonArray = JSONArray.fromObject(userlist);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		out.print(jsonArray);
+		out.close();
+
+	}
+
+	// 添加user
+	public void add() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		User user = new User();
+		request.setCharacterEncoding("utf-8");
+		user.setEmail(request.getParameter("email"));
+		user.setPassword(request.getParameter("password"));
+		user.setType(Integer.parseInt(request.getParameter("type")));
+		user.setIsmember(Integer.parseInt(request.getParameter("ismember")));
+		user.setRegister_time(new Timestamp(new Date().getTime()));
+		user.setNew_login_time(new Timestamp(new Date().getTime()));
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		
+		if (userdao.save(user) > 0) {
+
+			data.put("info", 1);
+			out.print(data);
+
+		} else {
+			data.put("info", 0);
+			out.print(data);
+		}
+
+		out.close();
+	}
+
+	// 修改user
+	public void mod() throws Exception {
+
+		HttpServletRequest request = ServletActionContext.getRequest();
+		User user = userdao.findByEmail(request.getParameter("email"));
+		user.setPassword(request.getParameter("password"));
+		user.setType(Integer.parseInt(request.getParameter("type")));
+		user.setIsmember(Integer.parseInt(request.getParameter("ismember")));
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		userdao.update(user);
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+	}
+	// 批量删除user
+	public void batdelete() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		String ids = request.getParameter("ids");
+		String[] id = ids.split("a");
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		for (int i = 0; i < id.length; i++) {
+			 userdao.delete(Integer.parseInt(id[i]));
+			
+		}
+
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+	}
+
+	// 删除user
+	public void delete() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		int id = Integer.parseInt(request.getParameter("id"));
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		if (id > 0) {
+			userdao.delete(id);
+
+			data.put("info", 1);
+			out.print(data);
+
+		} else {
+			data.put("info", 0);
+			out.print(data);
+		}
+
+		out.close();
+	}
+
+	// 加载user
+	public void load() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		int id = Integer.parseInt(request.getParameter("id"));
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		User user = userdao.get(id);
+		if (user != null) {
+			data.put("email", user.getEmail());
+			data.put("password", user.getPassword());
+			data.put("type", user.getType());
+			data.put("ismember", user.getIsmember());
+			data.put("info", 1);
+			out.print(data);
+
+		} else {
+			data.put("info", 0);
+			out.print(data);
+
+		}
+
+	}
+	
+	public String loadinfo() throws Exception{
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		int id = Integer.parseInt(request.getParameter("id"));
+		HttpServletResponse response = ServletActionContext.getResponse();
+		User user = userdao.get(id);
+		
+		if(user.getEmail()!=null){
+			
+			setUser(user);
+			return "loadinfo_success";
+		}
+		return "request_failure";
+		
+	}
+
+	// 批量启用和禁用user
+	public void active() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		String ids = request.getParameter("ids");
+		int ismember = Integer.parseInt(request.getParameter("ismember"));
+		String[] id = ids.split("a");
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		for (int i = 0; i < id.length; i++) {
+			User user = userdao.get(Integer.parseInt(id[i]));
+			user.setIsmember(ismember);
+			userdao.update(user);
+		}
+
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+
+	}
+  //批量改变用户权限
+	public void type() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		String ids = request.getParameter("ids");
+		int type = Integer.parseInt(request.getParameter("type"));
+		String[] id = ids.split("a");
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		for (int i = 0; i < id.length; i++) {
+			User user = userdao.get(Integer.parseInt(id[i]));
+			user.setType(type);
+			userdao.update(user);
+		}
+
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+
+	}
+	public UserDao getUserdao() {
+		return userdao;
+	}
+
+	public void setUserdao(UserDao userdao) {
+		this.userdao = userdao;
+	}
+
+	public List<User> getUserlist() {
+		return userlist;
+	}
+
+	public void setUserlist(List<User> userlist) {
+		this.userlist = userlist;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Map getSession() {
+		return session;
+	}
+
+	public void setSession(Map session) {
+		this.session = session;
+	}
+	public String getTip() {
+		return tip;
+	}
+
+	public void setTip(String tip) {
+		this.tip = tip;
+	}
+	
+}

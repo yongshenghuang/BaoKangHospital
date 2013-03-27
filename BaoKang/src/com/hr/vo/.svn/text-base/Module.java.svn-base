@@ -1,0 +1,71 @@
+package com.lhs.vo;
+
+import java.sql.Timestamp;
+
+public class Module {
+int id;
+String title;
+int posttotal;
+int topictotal;
+Timestamp createtime;
+User user;
+int islegal;
+String description;
+String image_uuid;
+public int getId() {
+	return id;
+}
+public void setId(int id) {
+	this.id = id;
+}
+public String getTitle() {
+	return title;
+}
+public void setTitle(String title) {
+	this.title = title;
+}
+public int getPosttotal() {
+	return posttotal;
+}
+public void setPosttotal(int posttotal) {
+	this.posttotal = posttotal;
+}
+public int getTopictotal() {
+	return topictotal;
+}
+public void setTopictotal(int topictotal) {
+	this.topictotal = topictotal;
+}
+public Timestamp getCreatetime() {
+	return createtime;
+}
+public void setCreatetime(Timestamp createtime) {
+	this.createtime = createtime;
+}
+
+public User getUser() {
+	return user;
+}
+public void setUser(User user) {
+	this.user = user;
+}
+public int getIslegal() {
+	return islegal;
+}
+public void setIslegal(int islegal) {
+	this.islegal = islegal;
+}
+public String getDescription() {
+	return description;
+}
+public void setDescription(String description) {
+	this.description = description;
+}
+public String getImage_uuid() {
+	return image_uuid;
+}
+public void setImage_uuid(String imageUuid) {
+	image_uuid = imageUuid;
+}
+
+}

@@ -1,0 +1,129 @@
+package com.lhs.control;
+
+import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.struts2.ServletActionContext;
+
+import com.lhs.dao.CommentDao;
+import com.lhs.dao.TwitterDao;
+import com.lhs.vo.Comment;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class CommentAction extends ActionSupport {
+	public CommentDao commentdao;
+	public TwitterDao twitterdao;
+	public Comment comment;
+	public Twitter twitter;
+	public List<Comment> commentlist;
+	public Map session;
+
+	//查找微博的所有评论
+	public void FindByTwitter() throws Exception{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		int twitter_id=Integer.parseInt(request.getParameter("id"));
+		commentlist=commentdao.findTwitterComment(twitter_id);
+		JSONObject data = new JSONObject();
+		data.put("info", 1);
+		data.put("comments", commentlist);
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		out.print(data);
+		out.close();
+		
+	}
+	
+	// 增加评论
+	public void add() throws Exception {
+		comment = new Comment();
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		session = ActionContext.getContext().getSession();
+
+		request.setCharacterEncoding("utf-8");
+		comment.setIslegal(1);
+        int twitter_id=Integer.parseInt(request.getParameter("id"));
+		comment.setContent(request.getParameter("content"));
+		comment.setCreatetime(new Timestamp(new Date().getTime()));
+		comment.setTwitter_id(twitter_id);
+		//修改twitter表中commenttimes
+		twitter=twitterdao.get(twitter_id);
+		twitter.setCommenttimes(twitter.getCommenttimes()+1);
+        twitterdao.update(twitter);
+		comment.setUser((User) session.get("user"));
+
+		JSONObject data = new JSONObject();
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		if (commentdao.save(comment) > 0) {
+			data.put("info", 1);
+			data.put("comment", comment);
+			data.put("commenttimes", twitter.getCommenttimes());
+
+		} else {
+			data.put("info", 0);
+		}
+
+		out.print(data);
+		out.close();
+
+	}
+
+	public CommentDao getCommentdao() {
+		return commentdao;
+	}
+
+	public void setCommentdao(CommentDao commentdao) {
+		this.commentdao = commentdao;
+	}
+
+	public Comment getComment() {
+		return comment;
+	}
+
+	public void setComment(Comment comment) {
+		this.comment = comment;
+	}
+
+	public List<Comment> getCommentlist() {
+		return commentlist;
+	}
+
+	public void setCommentlist(List<Comment> commentlist) {
+		this.commentlist = commentlist;
+	}
+
+	public Map getSession() {
+		return session;
+	}
+
+	public void setSession(Map session) {
+		this.session = session;
+	}
+
+	public TwitterDao getTwitterdao() {
+		return twitterdao;
+	}
+
+	public void setTwitterdao(TwitterDao twitterdao) {
+		this.twitterdao = twitterdao;
+	}
+
+}

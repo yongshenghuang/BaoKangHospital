@@ -1,0 +1,74 @@
+package com.lhs.dao.impl;
+
+import java.util.List;
+
+import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+
+import com.lhs.dao.TwitterDao;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+
+public class TwittrDaoImpl implements TwitterDao {
+	// 定义一个HibernateTemplate对象，用于执行持久化操作
+	private HibernateTemplate ht = null;
+	// Hibernate持久化操作所需的SessionFactory
+	private SessionFactory sessionFactory;
+
+	// 依赖注入SessionFactory的setter方法
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+	// 初始化HibernateTemplate的方法
+	private HibernateTemplate getHibernateTemplate() {
+		if (ht == null) {
+			ht = new HibernateTemplate(sessionFactory);
+		}
+		return ht;
+	}
+
+	public void delete(Integer id) {
+		// TODO Auto-generated method stub
+		getHibernateTemplate().delete(get(id));
+	}
+
+	public void delete(Twitter twitter) {
+		// TODO Auto-generated method stub
+		getHibernateTemplate().delete(twitter);
+	}
+
+	public List findUserTwitter(User user) {
+		// TODO Auto-generated method stub
+		return  (List) getHibernateTemplate().find("from Twitter where user_id=? order by createtime desc",user.getId()); 
+	}
+
+	public Twitter get(Integer id) {
+		// TODO Auto-generated method stub
+		return (Twitter) getHibernateTemplate().get(Twitter.class, id);
+	}
+
+	public long getTwitterNumber() {
+		return (Long) getHibernateTemplate().find(
+		"select count(*) from twitter as p").get(0);
+	}
+
+	public Integer save(Twitter twitter) {
+		// TODO Auto-generated method stub
+		return (Integer) getHibernateTemplate().save(twitter);
+	}
+
+	public List findAllTwitter() {
+		// TODO Auto-generated method stub
+		return  (List) getHibernateTemplate().find("from Twitter order by createtime desc");
+	}
+
+	public void update(Twitter twitter) {
+		// TODO Auto-generated method stub
+		getHibernateTemplate().update(twitter);
+	}
+
+
+	
+
+}

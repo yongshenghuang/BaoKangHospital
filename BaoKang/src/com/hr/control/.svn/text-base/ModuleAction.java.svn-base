@@ -1,0 +1,286 @@
+package com.lhs.control;
+
+import java.io.PrintWriter;
+
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.struts2.ServletActionContext;
+
+import com.lhs.dao.ModuleDao;
+import com.lhs.dao.TopicDao;
+import com.lhs.dao.UserDao;
+import com.lhs.vo.Comment;
+import com.lhs.vo.Module;
+import com.lhs.vo.ModuleDemo;
+import com.lhs.vo.Topic;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class ModuleAction extends ActionSupport {
+	public Module module;
+	public Map session;
+	public UserDao userdao;
+	public ModuleDao moduledao;
+    public TopicDao topicdao;
+	public List<Module> modulelist;
+    public   ModuleDemo mouledemo;
+    
+	public ModuleDemo getMouledemo() {
+		return mouledemo;
+	}
+
+	public void setMouledemo(ModuleDemo mouledemo) {
+		this.mouledemo = mouledemo;
+	}
+
+	// 加载所有模块信息
+	public void load() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		int id = Integer.parseInt(request.getParameter("id"));
+		Module module = moduledao.get(id);
+		JSONObject data = new JSONObject();
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		if (module != null) {
+			data.put("info", 1);
+			data.put("module", module);
+			data.put("users", userdao.findAllUser());
+
+		} else {
+			data.put("info", 0);
+		}
+
+		out.print(data);
+		out.close();
+
+	}
+
+	// 修改模块
+	public void mod() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		int module_id = Integer.parseInt(request.getParameter("module_id"));
+		module = moduledao.get(module_id);
+		module.setTitle(request.getParameter("title"));
+		module.setUser(userdao.get(Integer.parseInt(request
+				.getParameter("user_id"))));
+		module.setDescription(request.getParameter("description"));
+		module.setIslegal(Integer.parseInt(request.getParameter("islegal")));
+		moduledao.update(module);
+		JSONObject data = new JSONObject();
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		data.put("info", 1);
+
+		out.print(data);
+		out.close();
+	}
+
+	// 增加新模块
+	public void add() throws Exception {
+		module = new Module();
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		request.setCharacterEncoding("utf-8");
+		module.setIslegal(Integer.parseInt(request.getParameter("islegal")));
+		module.setTitle(request.getParameter("title"));
+		module.setCreatetime(new Timestamp(new Date().getTime()));
+		module.setUser(userdao.get(Integer.parseInt(request
+				.getParameter("user_id"))));
+		module.setDescription(request.getParameter("description"));
+		module.setPosttotal(0);
+		module.setTopictotal(0);
+		JSONObject data = new JSONObject();
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		if (moduledao.save(module) > 0) {
+			module=moduledao.findModuleByTitle(module.getTitle());
+			data.put("info", 1);
+			data.put("module_id",module.getId());
+
+		} else {
+			data.put("info", 0);
+		}
+
+		out.print(data);
+		out.close();
+
+	}
+
+	// 展示所有模块
+	public void listAll() throws Exception {
+		modulelist = moduledao.findAllModule();
+		JSONArray data = JSONArray.fromObject(modulelist);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		out.print(data);
+		out.close();
+
+	}
+	// 展示所有模块
+	public void listLegalAll() throws Exception {
+		modulelist = moduledao.findAllModuleByIslegal(1);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		JSONObject data = new JSONObject();
+		response.setCharacterEncoding("UTF-8");
+			PrintWriter out = response.getWriter();
+		  for (int i = 0; i < modulelist.size(); i++) {
+        	 modulelist.get(i).getUser().setPassword(null);
+		}
+	  List<ModuleDemo> moduledemolist=new ArrayList<ModuleDemo>();
+	 for (int i = 0; i < modulelist.size(); i++) {
+		 mouledemo=new ModuleDemo();
+		 mouledemo.setTopiclist(topicdao.findModuleTopic(modulelist.get(i).getId(), 3));
+		mouledemo.setModule(modulelist.get(i));
+		  moduledemolist.add(mouledemo);
+	}
+			data.put("info", 1);
+			data.put("moduledemolist", moduledemolist);
+			
+		
+
+		out.print(data);
+		out.close();
+
+	}
+	// 批量启用和禁用module
+	public void active() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		String ids = request.getParameter("ids");
+		int islegal = Integer.parseInt(request.getParameter("islegal"));
+		String[] id = ids.split("a");
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		for (int i = 0; i < id.length; i++) {
+			 module = moduledao.get(Integer.parseInt(id[i]));
+			 module.setIslegal(islegal);
+			 moduledao.update(module);
+		}
+
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+
+	}
+	//批量删除
+	public void batdelete() throws Exception{
+		
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		String ids = request.getParameter("ids");
+		String[] id = ids.split("a");
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		for (int i = 0; i < id.length; i++) {
+			System.out.println("---"+id[i]);
+			  moduledao.delete(Integer.parseInt(id[i]));
+	
+		}
+
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+		
+	}
+	// 删除module
+	public void delete() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		int id = Integer.parseInt(request.getParameter("id"));
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+		if (id > 0) {
+			moduledao.delete(id);
+//并且删除所有topic和post
+			data.put("info", 1);
+			out.print(data);
+
+		} else {
+			data.put("info", 0);
+			out.print(data);
+		}
+
+		out.close();
+	}
+	public Module getModule() {
+		return module;
+	}
+
+	public void setModule(Module module) {
+		this.module = module;
+	}
+
+	public Map getSession() {
+		return session;
+	}
+
+	public void setSession(Map session) {
+		this.session = session;
+	}
+
+	public ModuleDao getModuledao() {
+		return moduledao;
+	}
+
+	public void setModuledao(ModuleDao moduledao) {
+		this.moduledao = moduledao;
+	}
+
+	public UserDao getUserdao() {
+		return userdao;
+	}
+
+	public void setUserdao(UserDao userdao) {
+		this.userdao = userdao;
+	}
+
+	public List<Module> getModulelist() {
+		return modulelist;
+	}
+
+	public void setModulelist(List<Module> modulelist) {
+		this.modulelist = modulelist;
+	}
+
+	public TopicDao getTopicdao() {
+		return topicdao;
+	}
+
+	public void setTopicdao(TopicDao topicdao) {
+		this.topicdao = topicdao;
+	}
+
+}

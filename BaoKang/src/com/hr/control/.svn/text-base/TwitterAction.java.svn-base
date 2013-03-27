@@ -1,0 +1,166 @@
+package com.lhs.control;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.struts2.ServletActionContext;
+
+import com.lhs.dao.TwitterDao;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class TwitterAction extends ActionSupport {
+	public TwitterDao twitterdao;
+	public Twitter twitter;
+	public List<Twitter> twitterlist;
+	public Map session;
+
+	// 增加赞的次数
+	public void addYestimes() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		int id = Integer.parseInt(request.getParameter("id"));
+		twitter = twitterdao.get(id);
+		twitter.setYestimes(twitter.getYestimes() + 1);
+		twitterdao.update(twitter);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+
+	}
+    //增加踩的次数
+	public void addNotimes() throws Exception{
+		
+		HttpServletRequest request = ServletActionContext.getRequest();
+		int id = Integer.parseInt(request.getParameter("id"));
+		twitter = twitterdao.get(id);
+		twitter.setNotimes(twitter.getNotimes() + 1);
+		twitterdao.update(twitter);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		JSONObject data = new JSONObject();
+
+		data.put("info", 1);
+		out.print(data);
+
+		out.close();
+	}
+	// 展示用户微博
+	public void listUserAll() throws Exception {
+
+		session = ActionContext.getContext().getSession();
+		twitterlist = twitterdao.findUserTwitter((User) session.get("user"));
+		JSONObject data = new JSONObject();
+		data.put("twitters", twitterlist);
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		out.print(data);
+		out.close();
+
+	}
+
+	// 展示所有微博
+	public void listAll() throws Exception {
+		session = ActionContext.getContext().getSession();
+		twitterlist = twitterdao.findAllTwitter();
+		JSONArray data = JSONArray.fromObject(twitterlist);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		out.print(data);
+		out.close();
+
+	}
+
+	// 发送微博
+	public void create() throws Exception {
+
+		HttpServletRequest request = ServletActionContext.getRequest();
+
+		session = ActionContext.getContext().getSession();
+
+		twitter = new Twitter();
+		request.setCharacterEncoding("utf-8");
+		twitter.setContent(request.getParameter("content"));
+		twitter.setIslegal(1);
+
+		twitter.setNotimes(0);
+
+		twitter.setYestimes(0);
+		twitter.setCommenttimes(0);
+		twitter.setCreatetime(new Timestamp(new Date().getTime()));
+
+		twitter.setUser((User) session.get("user"));
+
+		JSONObject data = new JSONObject();
+
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		if (twitterdao.save(twitter) > 0) {
+			data.put("info", 1);
+			data.put("twitter", twitter);
+
+		} else {
+			data.put("info", 0);
+		}
+
+		out.print(data);
+		out.close();
+
+	}
+
+	public TwitterDao getTwitterdao() {
+		return twitterdao;
+	}
+
+	public void setTwitterdao(TwitterDao twitterdao) {
+		this.twitterdao = twitterdao;
+	}
+
+	public Twitter getTwitter() {
+		return twitter;
+	}
+
+	public void setTwitter(Twitter twitter) {
+		this.twitter = twitter;
+	}
+
+	public List<Twitter> getTwitterlist() {
+		return twitterlist;
+	}
+
+	public void setTwitterlist(List<Twitter> twitterlist) {
+		this.twitterlist = twitterlist;
+	}
+
+	public Map getSession() {
+		return session;
+	}
+
+	public void setSession(Map session) {
+		this.session = session;
+	}
+
+}

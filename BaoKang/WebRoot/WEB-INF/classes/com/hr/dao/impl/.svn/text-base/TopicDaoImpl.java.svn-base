@@ -1,0 +1,84 @@
+package com.lhs.dao.impl;
+
+import java.util.List;
+
+import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+
+import com.lhs.dao.CommentDao;
+import com.lhs.dao.TopicDao;
+import com.lhs.vo.Comment;
+import com.lhs.vo.Topic;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+
+public class TopicDaoImpl implements TopicDao {
+	// 定义一个HibernateTemplate对象，用于执行持久化操作
+	private HibernateTemplate ht = null;
+	// Hibernate持久化操作所需的SessionFactory
+	private SessionFactory sessionFactory;
+
+	// 依赖注入SessionFactory的setter方法
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+	// 初始化HibernateTemplate的方法
+	private HibernateTemplate getHibernateTemplate() {
+		if (ht == null) {
+			ht = new HibernateTemplate(sessionFactory);
+		}
+		return ht;
+	}
+	public void delete(Integer id) {
+	getHibernateTemplate().delete(get(id));
+
+	}
+
+	public void delete(Topic Topic) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+
+	public List findUserTopic(User user) {
+		// TODO Auto-generated method stub
+		return  (List) getHibernateTemplate().find("from Topic where user_id=? order by createtime desc",user.getId()); 
+	}
+
+	public Topic get(Integer id) {
+		return (Topic) getHibernateTemplate().get(Topic.class, id);
+	}
+
+	public int getModuleTopicNumber(int module_id) {
+		// TODO Auto-generated method stub
+		return ((List) getHibernateTemplate().find("from Topic where module_id=?",module_id)).size(); 
+	}
+
+	public Integer save(Topic Topic) {
+		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
+		return (Integer) getHibernateTemplate().save(Topic);
+	}
+
+	public void update(Topic Topic) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public List findModuleTopic(int  module_id) {
+		// TODO Auto-generated method stub
+		return  (List) getHibernateTemplate().find("from Topic where module_id=? order by createtime desc",module_id); 
+	}
+
+	public List findModuleTopic(int module_id, int num) {
+		List<Object> objects=(List) getHibernateTemplate().find("from Topic where module_id=? order by createtime desc",module_id);
+		if(objects.size()>num){
+			
+		return  objects.subList(0, num);
+		
+		}else return objects;
+	}
+
+}

@@ -1,0 +1,181 @@
+package com.lhs.control;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts2.ServletActionContext;
+
+import com.lhs.dao.ModuleDao;
+import com.lhs.dao.UserDao;
+import com.lhs.vo.Module;
+import com.lhs.vo.User;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+
+public class UploadAction extends ActionSupport{
+private UserDao userdao;
+private ModuleDao moduledao;
+private File upload;
+private String uploadContentType;
+private String savePath;
+private String uploadFileName;
+private Module module;
+Map session;
+public File getUpload() {
+	return this.upload;
+}
+public void setUpload(File upload) {
+	this.upload = upload;
+}
+public String getUploadContentType() {
+	return uploadContentType;
+}
+public void setUploadContentType(String uploadContentType) {
+	this.uploadContentType = uploadContentType;
+}
+public String getSavePath() {
+	return ServletActionContext.getServletContext().getRealPath("/images/"+savePath);
+}
+public void setSavePath(String savePath) {
+	this.savePath = savePath;
+}
+public void file() throws Exception{
+	HttpServletRequest request=ServletActionContext.getRequest();
+	request.setCharacterEncoding("utf-8");
+	
+	Module module=moduledao.get(Integer.parseInt(request.getParameter("module_id")));
+	
+	
+	
+
+	File file=getUpload();
+		
+	String uuid=java.util.UUID.randomUUID().toString();
+	String type=getUploadContentType();
+	String ext=type.split("/")[1];
+	String new_filename=uuid+"."+ext;
+	FileOutputStream fos=new FileOutputStream(getSavePath()+"\\"+new_filename);
+	FileInputStream fis=new FileInputStream(file);
+	
+	byte[] buffer=new byte[1024];
+	int len=0;
+	
+	while ((len=fis.read(buffer))>0) {
+		fos.write(buffer,0,len);
+	}
+	
+	module.setImage_uuid(new_filename);
+	moduledao.update(module);
+	HttpServletResponse response=ServletActionContext.getResponse();
+
+	
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	response.setCharacterEncoding("UTF-8");
+	PrintWriter out=response.getWriter();
+			//输出HTML标签
+		out.println("<html>");
+		out.println("<head>");
+		out.println("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
+		out.println("<title>访问Servlet初始化参数测试</title>");
+		out.println("</head>");
+		out.println("<body>");
+		 out.print("<h3>设置成功</h3>");
+		   out.print("<img width='300' height='300' src='"+basePath+"images"+savePath+new_filename+"'/>");
+		out.println("</body>");
+		out.println("</html>");
+
+}
+public void head() throws Exception{
+	HttpServletRequest request=ServletActionContext.getRequest();
+	request.setCharacterEncoding("utf-8");
+	
+	User user=userdao.get(Integer.parseInt(request.getParameter("user_id")));
+	
+	String new_filename="";
+	
+	File file=getUpload();
+	if(user.getImage_uuid()!=null){
+		new_filename=user.getImage_uuid();	
+		File oldfile=new File(getSavePath()+"\\"+new_filename);
+		oldfile.delete();
+	}else{
+		String type=getUploadContentType();
+		String ext=type.split("/")[1];
+		String uuid=uuid=java.util.UUID.randomUUID().toString();
+	  new_filename=uuid+"."+ext;
+	}
+	
+	
+	FileOutputStream fos=new FileOutputStream(getSavePath()+"\\"+new_filename);
+	FileInputStream fis=new FileInputStream(file);
+	
+	byte[] buffer=new byte[1024];
+	int len=0;
+	
+	while ((len=fis.read(buffer))>0) {
+		fos.write(buffer,0,len);
+	}
+	
+	user.setImage_uuid(new_filename);
+	userdao.update(user);
+	session=ActionContext.getContext().getSession();
+	session.put("user",user);
+	HttpServletResponse response=ServletActionContext.getResponse();
+
+	
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	response.setCharacterEncoding("UTF-8");
+	PrintWriter out=response.getWriter();
+			//输出HTML标签
+		out.println("<html>");
+		out.println("<head>");
+		out.println("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
+		out.println("<title>访问Servlet初始化参数测试</title>");
+		out.println("</head>");
+		out.println("<body>");
+		  out.print("<img width='200' height='200' src='"+basePath+"images"+savePath+new_filename+"'/>");
+		out.println("</body>");
+		out.println("</html>");
+
+}
+public String getUploadFileName() {
+	return uploadFileName;
+}
+public void setUploadFileName(String uploadFileName) {
+	this.uploadFileName = uploadFileName;
+}
+public ModuleDao getModuledao() {
+	return moduledao;
+}
+public void setModuledao(ModuleDao moduledao) {
+	this.moduledao = moduledao;
+}
+public UserDao getUsedao() {
+	return userdao;
+}
+public void setUsedao(UserDao usedao) {
+	this.userdao = usedao;
+}
+public Module getModule() {
+	return module;
+}
+public void setModule(Module module) {
+	this.module = module;
+}
+public UserDao getUserdao() {
+	return userdao;
+}
+public void setUserdao(UserDao userdao) {
+	this.userdao = userdao;
+}
+
+}
+

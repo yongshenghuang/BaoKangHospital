@@ -1,0 +1,68 @@
+package com.lhs.dao;
+
+import java.util.List;
+
+import com.lhs.vo.Module;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+
+public interface ModuleDao {
+	Module get(Integer id);
+
+	
+	/**
+	 * 保存Twitter实例
+	 * 
+	 * @param Twitter
+	 *            需要保存的Twitter实例
+	 * @return 刚刚保存的Twitter实例的标识属性值
+	 */
+	Integer save(Module module);
+
+	/**
+	 * 保存Twitter实例，是否有重复的名字
+	 * 
+	 * @param Twitter
+	 *            需要保存的Twitter实例
+	 * @return 刚刚保存的Twitter实例的标识属性值
+	 */
+
+	void delete(Integer id);
+
+	/**
+	 * 删除Twitter实例
+	 * 
+	 * @param Twitter
+	 *            需要删除的Twitter实例
+	 */
+	void delete(Module module);
+
+	/**
+	 * 根据主题名查找Twitter
+	 * 
+	 * @param title
+	 *            查询的人名
+	 * @return 指定用户名对应的全部Twitter
+	 */
+	
+	public List findUserModule(User user);
+
+	
+	public List findAllModule();
+	public Module findModuleByTitle(String title) ;
+	public List findAllModuleByIslegal(int islegal);
+	/**
+	 * 查询数据表中Twitter实例的总数
+	 * 
+	 * @return 数据表中Twitter实例的总数
+	 */
+	long getModuleNumber();
+	/**
+	 * 檢查Twitter实例
+	 * 
+	 * @param Twitter
+	 *           
+	 * @return 刚刚檢查的Twitter实例的标识属性值
+	 */
+	void update(Module module);
+}

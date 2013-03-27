@@ -1,0 +1,50 @@
+package com.lhs.vo;
+
+import java.sql.Timestamp;
+
+public class Comment {
+int id;
+int islegal;
+String content;
+Timestamp createtime;
+User user;
+int twitter_id;
+public int getId() {
+	return id;
+}
+public void setId(int id) {
+	this.id = id;
+}
+public String getContent() {
+	return content;
+}
+public void setContent(String content) {
+	this.content = content;
+}
+public Timestamp getCreatetime() {
+	return createtime;
+}
+public void setCreatetime(Timestamp createtime) {
+	this.createtime = createtime;
+}
+public User getUser() {
+	return user;
+}
+public void setUser(User user) {
+	this.user = user;
+}
+
+public int getTwitter_id() {
+	return twitter_id;
+}
+public void setTwitter_id(int twitterId) {
+	twitter_id = twitterId;
+}
+public int getIslegal() {
+	return islegal;
+}
+public void setIslegal(int islegal) {
+	this.islegal = islegal;
+}
+
+}

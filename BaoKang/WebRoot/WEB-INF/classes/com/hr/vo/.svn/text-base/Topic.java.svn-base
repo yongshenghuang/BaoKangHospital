@@ -1,0 +1,70 @@
+package com.lhs.vo;
+
+import java.sql.Timestamp;
+
+public class Topic {
+int id;
+String title;
+String content;
+int visit_times;
+int post_total;
+Timestamp createtime;
+int module_id;
+int islegal;
+User user;
+public int getId() {
+	return id;
+}
+public void setId(int id) {
+	this.id = id;
+}
+public String getTitle() {
+	return title;
+}
+public void setTitle(String title) {
+	this.title = title;
+}
+public String getContent() {
+	return content;
+}
+public void setContent(String content) {
+	this.content = content;
+}
+public int getVisit_times() {
+	return visit_times;
+}
+public void setVisit_times(int visitTimes) {
+	visit_times = visitTimes;
+}
+public int getPost_total() {
+	return post_total;
+}
+public void setPost_total(int postTotal) {
+	post_total = postTotal;
+}
+public Timestamp getCreatetime() {
+	return createtime;
+}
+public void setCreatetime(Timestamp createtime) {
+	this.createtime = createtime;
+}
+public int getModule_id() {
+	return module_id;
+}
+public void setModule_id(int moduleId) {
+	module_id = moduleId;
+}
+public int getIslegal() {
+	return islegal;
+}
+public void setIslegal(int islegal) {
+	this.islegal = islegal;
+}
+public User getUser() {
+	return user;
+}
+public void setUser(User user) {
+	this.user = user;
+}
+
+}

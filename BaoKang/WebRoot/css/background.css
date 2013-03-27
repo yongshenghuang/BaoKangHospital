@@ -1,0 +1,29 @@
+a{
+text-decoration: none;
+}
+.wrapper {
+	width: 1008px;
+	margin:0 200px;
+}
+
+.header {
+	width: 100%;
+}
+
+.container {
+	width: 100%px;
+}
+
+.cont_left {
+	float: left;
+	width: 200px;
+}
+
+.cont_right {
+	float: left;
+	width: 800px;
+}
+
+.footer {
+	width: 100%;
+}

@@ -1,0 +1,76 @@
+package com.lhs.dao.impl;
+
+import java.util.List;
+
+import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+
+import com.lhs.dao.CommentDao;
+import com.lhs.vo.Comment;
+import com.lhs.vo.Twitter;
+import com.lhs.vo.User;
+
+public class CommentDaoImpl implements CommentDao {
+	// 定义一个HibernateTemplate对象，用于执行持久化操作
+	private HibernateTemplate ht = null;
+	// Hibernate持久化操作所需的SessionFactory
+	private SessionFactory sessionFactory;
+
+	// 依赖注入SessionFactory的setter方法
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+	// 初始化HibernateTemplate的方法
+	private HibernateTemplate getHibernateTemplate() {
+		if (ht == null) {
+			ht = new HibernateTemplate(sessionFactory);
+		}
+		return ht;
+	}
+	public void delete(Integer id) {
+	getHibernateTemplate().delete(get(id));
+
+	}
+
+	public void delete(Comment comment) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public List findAllComment() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List findUserComment(User user) {
+		// TODO Auto-generated method stub
+		return  (List) getHibernateTemplate().find("from Comment where user_id=? order by createtime desc",user.getId()); 
+	}
+
+	public Comment get(Integer id) {
+		return (Comment) getHibernateTemplate().get(Comment.class, id);
+	}
+
+	public long getCommentNumber() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public Integer save(Comment comment) {
+		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
+		return (Integer) getHibernateTemplate().save(comment);
+	}
+
+	public void update(Comment comment) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public List findTwitterComment(int  twiiter_id) {
+		// TODO Auto-generated method stub
+		return  (List) getHibernateTemplate().find("from Comment where twitter_id=? order by createtime desc",twiiter_id); 
+	}
+
+}

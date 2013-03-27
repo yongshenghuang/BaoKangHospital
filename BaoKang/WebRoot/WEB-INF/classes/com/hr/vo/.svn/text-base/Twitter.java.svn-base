@@ -1,0 +1,72 @@
+package com.lhs.vo;
+import java.sql.Timestamp;
+import java.util.Set;
+public class Twitter {
+int id;
+String content;
+Timestamp createtime;
+String imagepath;
+int yestimes;
+int notimes;
+int islegal;
+User user;
+int commenttimes;
+public int getId() {
+	return id;
+}
+public void setId(int id) {
+	this.id = id;
+}
+public String getContent() {
+	return content;
+}
+public void setContent(String content) {
+	this.content = content;
+}
+public Timestamp getCreatetime() {
+	return createtime;
+}
+public void setCreatetime(Timestamp createtime) {
+	this.createtime = createtime;
+}
+public String getImagepath() {
+	return imagepath;
+}
+public void setImagepath(String imagepath) {
+	this.imagepath = imagepath;
+}
+public int getYestimes() {
+	return yestimes;
+}
+public void setYestimes(int yestimes) {
+	this.yestimes = yestimes;
+}
+public int getNotimes() {
+	return notimes;
+}
+public void setNotimes(int notimes) {
+	this.notimes = notimes;
+}
+public User getUser() {
+	return user;
+}
+public void setUser(User user) {
+	this.user = user;
+}
+public int getIslegal() {
+	return islegal;
+}
+public void setIslegal(int islegal) {
+	this.islegal = islegal;
+}
+public int getCommenttimes() {
+	return commenttimes;
+}
+public void setCommenttimes(int commenttimes) {
+	this.commenttimes = commenttimes;
+}
+
+
+
+
+}

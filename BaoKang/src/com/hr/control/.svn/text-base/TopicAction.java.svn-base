@@ -1,0 +1,120 @@
+package com.lhs.control;
+
+import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+
+import com.lhs.dao.ModuleDao;
+import com.lhs.dao.TopicDao;
+import com.lhs.vo.Module;
+import com.lhs.vo.Topic;
+import com.lhs.vo.User;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.struts2.ServletActionContext;
+
+public class TopicAction extends ActionSupport {
+	Topic topic;
+	TopicDao topicdao;
+	ModuleDao moduledao;
+	List<Topic> topiclist;
+	Map session;
+	Module module;
+
+	public ModuleDao getModuledao() {
+		return moduledao;
+	}
+	public void setModuledao(ModuleDao moduledao) {
+		this.moduledao = moduledao;
+	}
+	//列举所有的主题
+	public void listAll() throws Exception {
+		HttpServletRequest request=ServletActionContext.getRequest();
+		int moudle_id=Integer.parseInt(request.getParameter("module_id"));
+		topiclist = topicdao.findModuleTopic(moudle_id);
+		JSONArray data = JSONArray.fromObject(topiclist);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+
+		out.print(data);
+		out.close();
+	
+	
+	}
+	//增加主题
+	public void add() throws Exception {
+		HttpServletRequest request=ServletActionContext.getRequest();
+		int moudle_id=Integer.parseInt(request.getParameter("module_id"));
+		module=moduledao.get(moudle_id);
+		request.setCharacterEncoding("utf-8");
+		session=ActionContext.getContext().getSession();
+		topic=new Topic();
+		topic.setVisit_times(0);
+		topic.setPost_total(0);
+		topic.setModule_id(moudle_id);
+		topic.setCreatetime(new Timestamp(new Date().getTime()));
+		topic.setContent(request.getParameter("content"));
+		topic.setTitle(request.getParameter("title"));
+		topic.setIslegal(Integer.parseInt(request.getParameter("islegal")));
+		topic.setUser((User)session.get("user"));
+      JSONObject data=new JSONObject();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+if(topicdao.save(topic)>0){
+	module.setTopictotal(topicdao.getModuleTopicNumber(moudle_id));
+	moduledao.update(module);
+	data.put("info", 1);
+	
+}else{
+	data.put("info",0);
+	
+}
+		out.print(data);
+		out.close();
+	
+	
+	}
+	public Topic getTopic() {
+		return topic;
+	}
+
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+	}
+
+	public TopicDao getTopicdao() {
+		return topicdao;
+	}
+
+	public void setTopicdao(TopicDao topicdao) {
+		this.topicdao = topicdao;
+	}
+
+	public List<Topic> getTopiclist() {
+		return topiclist;
+	}
+
+	public void setTopiclist(List<Topic> topiclist) {
+		this.topiclist = topiclist;
+	}
+
+	public Map getSession() {
+		return session;
+	}
+
+	public void setSession(Map session) {
+		this.session = session;
+	}
+
+}
