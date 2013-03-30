@@ -19,11 +19,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<!--
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	-->
-
+   <script type="text/javascript">function to(){ window.localtion.href="register.jsp";}</script> 
   </head>
   
   <body>
-    
+   <form action="user/CommerUserLogin" method="post"> 
 <table width="250px" border="1">
       <tr>
         <td colspan="3">&nbsp;</td>
@@ -31,17 +31,21 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       <tr>
         <td width="37%">用户名：</td>
         <td width="63%" colspan="2">
-          <input type="text" name="textbook" id="name" />
+          <input type="text" name="commerUser.name" />
         </td>
         </tr>
       <tr>
-        <td>密&nbsp;&nbsp;&nbsp; 码：</td>
-        <td colspan="2"> <input type="text" name="textbook" id="password" /></td>
+        <td>&nbsp;密 码：</td>
+        <td colspan="2"> <input type="text" name="commerUser.password" /></td>
         </tr>
       <tr>
-        <td>验证码：</td>
+        <td>&nbsp; 类别：</td>
         <td colspan="2"> 
-        <input type="text" name="textbook" id="VerificationCode" /> 
+        <select name="userType" width="350px">
+         <option value="commerUser" selected>普通用户</option>
+          <option value="doctor">医生</option>
+           <option value="admin" >管理员</option>
+           <option value="lead" >领导</option>
         </td>
         </tr>
       <tr>
@@ -49,7 +53,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
           <input type="submit" name="login" id="login" value="登陆" />
           &nbsp;
      <!--  <a href="regist.html">-->
-         <input type="submit" name="register" id="register" value="注册" onclick="window.location.href='regist.html'"/>
+       <input type="button" name="register" id="register" value="注册" Onclick=" window.location.href='http://localhost:8088/BaoKang/public/register.jsp'"/>
     
           &nbsp;  
             

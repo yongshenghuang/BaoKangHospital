@@ -12,4 +12,18 @@
             <!-- {0}_success.jsp -->
         </action>
     </package>
+   
+    <package name="userAction" extends="struts-default" namespace="/user">
+        <action name="CommerUserLogin" class="com.hr.control.CommerUserAction" method="login">
+            <result name="commerUser">/commerUser/user_index.jsp</result>
+            <result name="doctor">/doctor/doctor_index.jsp</result>
+            <result name="admin">/admin/admin_index.jsp</result>
+            <result name="loginFalse">/index.jsp</result>
+            
+           
+        </action>
+    </package>
+  
+   
+     <!-- {0}_success.jsp --> 
 </struts>

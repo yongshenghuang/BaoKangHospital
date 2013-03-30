@@ -23,6 +23,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    This is rifister page. <br>
+    This is register page. <br>
   </body>
 </html>

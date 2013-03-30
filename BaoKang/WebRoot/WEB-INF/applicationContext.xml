@@ -5,15 +5,18 @@
 	<!-- Spring配置文件的根元素 -->
 <beans>
 	
-	<bean id="UserDao" class="com.hr.dao.impl.UserDaoImpl">
+	<bean id="CommerUserDao" class="com.hr.dao.impl.CommerUserDaoImpl">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
 	
-	<bean id="UserAction" class="com.hr.control.UserAction" scope="prototype">
-		<property name="userdao" ref="UserDao" />
-	</bean>
 	
+	
+
+	
+	<bean id="CommerUserAction" class="com.hr.control.CommerUserAction" scope="prototype">
+		<property name="commerUserDao" ref="CommerUserDao" />
+	</bean>
 	
 	<!-- 定义数据源Bean，使用C3P0数据源实现 -->
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
@@ -44,8 +47,7 @@
 		<property name="mappingResources">
 			<list>
 				<!-- 以下用来列出Hibernate映射文件 -->
-				<value>User.hbm.xml</value>
-				
+				<value>CommerUser.hbm.xml</value>
 			</list>
 		</property>
 		<!-- 定义Hibernate的SessionFactory的属性 -->
